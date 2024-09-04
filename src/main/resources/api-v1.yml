@@ -1,0 +1,117 @@
+openapi: 3.0.1
+info:
+  title: example_api_v1
+  version: '1.0.0'
+  description: example api
+servers:
+  - url: '{protocol}://example/{basePath}'
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: https
+        description: This value is assigned by the transfer protocol that has to be used
+      basePath:
+        default: /e-commerce
+paths:
+  /prices:
+    get:
+      summary: servicio para obtener los precios finales de un producto de una cadena
+      description: servicio para obtener los precios finales de un producto de una cadena
+      operationId: getProductPrices
+      tags:
+        - prices
+      parameters:
+        - in: query
+          name: application_date
+          schema:
+            type: string
+            format: date-time
+            description: application date in the ISO-8601
+        - in: query
+          name: product_id
+          schema:
+            type: integer
+        - in: query
+          name: brand_id
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/product_prices_response'
+        400:
+          description: There was something wrong in the request and therefore could not be processed (headers, json syntax/content)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/general_error_response'
+        500:
+          description: Unknown Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/general_error_response'
+
+components:
+  schemas:
+    product_prices_response:
+      type: object
+      title: product prices response
+      required:
+        - product_id
+        - brand_id
+        - price_list
+        - start_date
+        - end_date
+        - price
+      properties:
+        product_id:
+          type: integer
+        brand_id:
+          type: integer
+        price_list:
+          type: integer
+        start_date:
+          type: string
+        end_date:
+          type: string
+        price:
+          type: number
+          format: float
+    general_response:
+      type: object
+      title: object of general response
+      required:
+        - code_return
+        - description_return
+      properties:
+        code_return:
+          type: string
+          description: Service return code.
+        description_return:
+          type: string
+          description: Description of the result of the operation performed whether it has gone correctly or the error occurred.
+    general_error_response:
+      type: object
+      title: Error en la aplicacion
+      required:
+        - message
+        - request_id
+      properties:
+        message:
+          type: string
+          description: Descripcion del resultado erroneo
+        request_id:
+          description: Codigo de peticion unico.
+          type: string
+        details:
+          description: objeto con el detalle adicional de errores que desee aportar
+          type: object
+        code:
+          description: code of error
+          type: string
